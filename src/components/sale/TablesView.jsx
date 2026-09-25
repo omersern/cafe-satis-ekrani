@@ -638,11 +638,9 @@ export default function TablesView({
   }, []);
 
   const mapToTableTiles = useCallback((computers, activeSessions, additions, categoryId) => {
-    const sessionsByStation = new Map();
-    const legacySessionsByMachine = new Map();
+    const sessionsByMachine = new Map();
     (activeSessions || []).forEach((session) => {
-      if (session.stationId != null) sessionsByStation.set(String(session.stationId), session);
-      else if (session.machineId) legacySessionsByMachine.set(String(session.machineId), session);
+      if (session.machineId) sessionsByMachine.set(String(session.machineId), session);
     });
 
     let list = computers || [];
@@ -651,10 +649,17 @@ export default function TablesView({
     }
 
     return list.map((c) => {
-      // Masa taşıma, aktif oturumun stationId'sini hedefe geçirir. Fiziksel
-      // machineId ile eşlemek kaynak masanın yanlışlıkla dolu kalmasına yol açar.
-      const session = sessionsByStation.get(String(c.cloudId || c.id))
-        || (c.machineId ? legacySessionsByMachine.get(String(c.machineId)) : null);
+      const stationId = String(c.cloudId || c.id);
+      const sessionsOnStation = (activeSessions || []).filter(
+        (item) => String(item.stationId) === stationId
+      );
+      // Normal kayıtta hem masa hem fiziksel PC eşleşir. Eski hatalı taşıma
+      // kayıtlarında station_id başka masaya geçmiş olsa bile fiziksel PC'de
+      // açık oturum varsa masa boş gösterilmemeli.
+      const session = sessionsOnStation.find(
+        (item) => c.machineId && String(item.machineId) === String(c.machineId)
+      ) || sessionsOnStation[0]
+        || (c.machineId ? sessionsByMachine.get(String(c.machineId)) : null);
       return {
         id: c.cloudId || c.id,
         localId: c.id,
