@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { saleBtn } from './ui/SaleModal';
 
 export default function ProductGrid({
@@ -24,14 +24,6 @@ export default function ProductGrid({
   const showSubCategories = subCategories.length > 0;
   const [query, setQuery] = useState('');
   const productRefs = useRef(new Map());
-  const matches = useMemo(() => {
-    const term = query.trim().toLocaleLowerCase('tr-TR');
-    if (!term) return [];
-    return allProducts
-      .filter((product) => String(product.name || '').toLocaleLowerCase('tr-TR').includes(term))
-      .slice(0, 8);
-  }, [allProducts, query]);
-
   useEffect(() => {
     if (!focusedProductId) return;
     const element = productRefs.current.get(String(focusedProductId));
@@ -53,37 +45,27 @@ export default function ProductGrid({
     <div className="sale-win11-product-grid-wrap p-3 sm:p-4">
       <header className="mb-3 flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white sm:text-3xl" />
-        <div className="relative w-full max-w-sm">
-          <label className="sr-only" htmlFor="sale-product-search">Ürün ara</label>
-          <input
-            id="sale-product-search"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Ürün ara…"
-            autoComplete="off"
-            className="min-h-10 w-full rounded-lg border border-[var(--sale-border)] bg-[var(--sale-surface)] px-3 text-[var(--sale-fg)] outline-none placeholder:text-[var(--sale-fg-subtle)] focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]"
-          />
-          {matches.length > 0 && (
-            <div className="absolute left-0 right-0 top-[calc(100%+.35rem)] z-40 overflow-hidden rounded-lg border border-[var(--sale-border-strong)] bg-[var(--sale-surface)] shadow-xl" role="listbox" aria-label="Ürün sonuçları">
-              {matches.map((product) => (
-                <button
-                  key={product.id}
-                  type="button"
-                  role="option"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => { onFindProduct?.(product); setQuery(''); }}
-                  className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-[var(--sale-fg)] hover:bg-[var(--sale-surface-hover)] focus-visible:bg-[var(--sale-surface-hover)]"
-                >
-                  <span>{product.name}</span>
-                  <small className="whitespace-nowrap text-[var(--sale-fg-subtle)]">{product.sell_price} ₺</small>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
         {!hasTable && (
           <div className="flex items-center gap-2">
+            <label className="sr-only" htmlFor="sale-product-search">Ürün ara</label>
+            <input
+              id="sale-product-search"
+              type="search"
+              value={query}
+              onChange={(event) => {
+                const value = event.target.value;
+                setQuery(value);
+                const term = value.trim().toLocaleLowerCase('tr-TR');
+                if (!term) return;
+                const product = allProducts.find((item) =>
+                  String(item.name || '').toLocaleLowerCase('tr-TR').includes(term)
+                );
+                if (product) onFindProduct?.(product);
+              }}
+              placeholder="Ürün ara…"
+              autoComplete="off"
+              className="min-h-10 w-36 rounded-lg border border-[var(--sale-border)] bg-[var(--sale-surface)] px-3 text-sm text-[var(--sale-fg)] outline-none placeholder:text-[var(--sale-fg-subtle)] focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)] sm:w-48"
+            />
             <button
               type="button"
               onClick={onEditAddition}
