@@ -638,8 +638,12 @@ export default function TablesView({
   }, []);
 
   const mapToTableTiles = useCallback((computers, activeSessions, additions, categoryId) => {
-    const sessMap = new Map();
-    (activeSessions || []).forEach((s) => sessMap.set(String(s.machineId), s));
+    const sessionsByStation = new Map();
+    const legacySessionsByMachine = new Map();
+    (activeSessions || []).forEach((session) => {
+      if (session.stationId != null) sessionsByStation.set(String(session.stationId), session);
+      else if (session.machineId) legacySessionsByMachine.set(String(session.machineId), session);
+    });
 
     let list = computers || [];
     if (categoryId != null) {
@@ -647,7 +651,10 @@ export default function TablesView({
     }
 
     return list.map((c) => {
-      const session = c.machineId ? sessMap.get(String(c.machineId)) : null;
+      // Masa taşıma, aktif oturumun stationId'sini hedefe geçirir. Fiziksel
+      // machineId ile eşlemek kaynak masanın yanlışlıkla dolu kalmasına yol açar.
+      const session = sessionsByStation.get(String(c.cloudId || c.id))
+        || (c.machineId ? legacySessionsByMachine.get(String(c.machineId)) : null);
       return {
         id: c.cloudId || c.id,
         localId: c.id,
