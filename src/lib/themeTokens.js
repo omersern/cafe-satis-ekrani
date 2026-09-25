@@ -1,0 +1,208 @@
+/**
+ * Tema renk paleti — Windows 11 acik/koyu tema.
+ * Renk degistirmek icin yalnizca bu dosyayi duzenle.
+ */
+
+export const THEME_STORAGE_KEY = 'app_theme';
+/** index.html bootstrap icin (Tauri store yuklenmeden once) */
+export const THEME_LS_KEY = 'wpos_app_theme';
+/** Otomatik modda son cozumlenen tema (flash onleme) */
+export const THEME_RESOLVED_LS_KEY = 'wpos_app_theme_resolved';
+
+/**
+ * Windows 11 Light — Fluent / Mica benzeri
+ * @see https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/color
+ */
+export const lightTheme = {
+  appBg: '#F3F3F3',
+  appFg: '#1A1A1A',
+  appMuted: '#605E5C',
+  appMuted2: '#8A8886',
+  appBorder: 'rgba(0, 0, 0, 0.08)',
+  appCardBg: '#FFFFFF',
+  appCardBorder: '#E5E5E5',
+  appGlass: 'rgba(255, 255, 255, 0.88)',
+  appGlassBorder: 'rgba(0, 0, 0, 0.06)',
+  appElevated: '#F9F9F9',
+  appElevatedHover: '#F0F0F0',
+  appModalBg: '#FFFFFF',
+  appPanelBg: '#FAFAFA',
+  appScrollbarTrack: '#EBEBEB',
+  appScrollbarThumb: '#C4C4C4',
+  appScrollbarThumbHover: '#A0A0A0',
+  appOverlay: 'rgba(0, 0, 0, 0.40)',
+  appAccent: '#0078D4',
+  appPinBg: '#F3F3F3',
+  appPinSurface: '#FFFFFF',
+  appPinBorder: '#E5E5E5',
+  appPinHover: '#F0F0F0',
+  appPinSelected: '#E5F1FB',
+
+  saleBg: '#F3F3F3',
+  saleBgDeep: '#EBEBEB',
+  saleSurface: '#FFFFFF',
+  saleSurfaceRaised: '#FAFAFA',
+  saleSurfaceHover: '#F0F0F0',
+  saleBorder: '#E5E5E5',
+  saleBorderStrong: '#D1D1D1',
+  saleFg: '#1A1A1A',
+  saleFgMuted: '#605E5C',
+  saleFgSubtle: '#8A8886',
+  saleOverlay: 'rgba(0, 0, 0, 0.45)',
+
+  /* Satis UI — acik temada yumusak mavi, dolu mavi degil */
+  salePillActiveBg: '#E5F1FB',
+  salePillActiveBorder: '#0078D4',
+  salePillActiveFg: '#003D6B',
+  salePillInactiveBg: '#FFFFFF',
+  salePillInactiveBorder: '#D1D1D1',
+  salePillInactiveFg: '#1A1A1A',
+  salePillInactiveHover: '#F5F5F5',
+
+  saleTabTrack: '#EBEBEB',
+  saleTabActiveBg: '#FFFFFF',
+  saleTabActiveFg: '#1A1A1A',
+  saleTabInactiveFg: '#605E5C',
+
+  saleBtnPrimaryBg: '#0078D4',
+  saleBtnPrimaryHover: '#106EBE',
+  saleBtnPrimaryFg: '#FFFFFF',
+  saleBtnSecondaryBg: '#FFFFFF',
+  saleBtnSecondaryBorder: '#D1D1D1',
+  saleBtnSecondaryFg: '#1A1A1A',
+  saleBtnSecondaryHover: '#F5F5F5',
+  saleBtnEditBg: '#FFFFFF',
+  saleBtnEditBorder: '#D1D1D1',
+  saleBtnEditFg: '#323130',
+  saleBtnEditHover: '#F5F5F5',
+};
+
+/** Mevcut koyu POS temasi */
+export const darkTheme = {
+  appBg: '#020617',
+  appFg: '#F8FAFC',
+  appMuted: '#94A3B8',
+  appMuted2: '#64748B',
+  appBorder: 'rgba(255, 255, 255, 0.06)',
+  appCardBg: 'rgba(255, 255, 255, 0.03)',
+  appCardBorder: 'rgba(255, 255, 255, 0.08)',
+  appGlass: 'rgba(15, 23, 42, 0.72)',
+  appGlassBorder: 'rgba(255, 255, 255, 0.06)',
+  appElevated: 'rgba(255, 255, 255, 0.04)',
+  appElevatedHover: 'rgba(255, 255, 255, 0.08)',
+  appModalBg: '#0F172A',
+  appPanelBg: '#0B1220',
+  appScrollbarTrack: '#1E293B',
+  appScrollbarThumb: '#475569',
+  appScrollbarThumbHover: '#64748B',
+  appOverlay: 'rgba(2, 6, 23, 0.70)',
+  appAccent: '#60CDFF',
+  appPinBg: '#1E293B',
+  appPinSurface: '#1E293B',
+  appPinBorder: '#334155',
+  appPinHover: '#334155',
+  appPinSelected: 'rgba(51, 65, 85, 0.80)',
+
+  saleBg: '#202020',
+  saleBgDeep: '#1a1a1a',
+  saleSurface: '#2d2d2d',
+  saleSurfaceRaised: '#333333',
+  saleSurfaceHover: '#383838',
+  saleBorder: 'rgba(255, 255, 255, 0.08)',
+  saleBorderStrong: 'rgba(255, 255, 255, 0.12)',
+  saleFg: '#FFFFFF',
+  saleFgMuted: '#A19F9D',
+  saleFgSubtle: '#8A8886',
+  saleOverlay: 'rgba(0, 0, 0, 0.55)',
+
+  salePillActiveBg: 'rgba(96, 205, 255, 0.15)',
+  salePillActiveBorder: '#60CDFF',
+  salePillActiveFg: '#FFFFFF',
+  salePillInactiveBg: '#2d2d2d',
+  salePillInactiveBorder: 'rgba(255, 255, 255, 0.12)',
+  salePillInactiveFg: '#FFFFFF',
+  salePillInactiveHover: '#383838',
+
+  saleTabTrack: '#1a1a1a',
+  saleTabActiveBg: '#383838',
+  saleTabActiveFg: '#FFFFFF',
+  saleTabInactiveFg: '#A19F9D',
+
+  saleBtnPrimaryBg: '#0078D4',
+  saleBtnPrimaryHover: '#106EBE',
+  saleBtnPrimaryFg: '#FFFFFF',
+  saleBtnSecondaryBg: '#2d2d2d',
+  saleBtnSecondaryBorder: 'rgba(255, 255, 255, 0.12)',
+  saleBtnSecondaryFg: '#FFFFFF',
+  saleBtnSecondaryHover: '#383838',
+  saleBtnEditBg: 'rgba(255, 185, 0, 0.10)',
+  saleBtnEditBorder: 'rgba(255, 185, 0, 0.30)',
+  saleBtnEditFg: '#FFB900',
+  saleBtnEditHover: 'rgba(255, 185, 0, 0.18)',
+};
+
+/** Token nesnesini CSS custom property map'ine cevir */
+export function tokensToCssVars(tokens) {
+  return {
+    '--app-bg': tokens.appBg,
+    '--app-fg': tokens.appFg,
+    '--app-muted': tokens.appMuted,
+    '--app-muted-2': tokens.appMuted2,
+    '--app-border': tokens.appBorder,
+    '--app-card-bg': tokens.appCardBg,
+    '--app-card-border': tokens.appCardBorder,
+    '--app-glass': tokens.appGlass,
+    '--app-glass-border': tokens.appGlassBorder,
+    '--app-elevated': tokens.appElevated,
+    '--app-elevated-hover': tokens.appElevatedHover,
+    '--app-modal-bg': tokens.appModalBg,
+    '--app-panel-bg': tokens.appPanelBg,
+    '--app-scrollbar-track': tokens.appScrollbarTrack,
+    '--app-scrollbar-thumb': tokens.appScrollbarThumb,
+    '--app-scrollbar-thumb-hover': tokens.appScrollbarThumbHover,
+    '--app-overlay': tokens.appOverlay,
+    '--app-accent': tokens.appAccent,
+    '--app-pin-bg': tokens.appPinBg,
+    '--app-pin-surface': tokens.appPinSurface,
+    '--app-pin-border': tokens.appPinBorder,
+    '--app-pin-hover': tokens.appPinHover,
+    '--app-pin-selected': tokens.appPinSelected,
+
+    '--sale-bg': tokens.saleBg,
+    '--sale-bg-deep': tokens.saleBgDeep,
+    '--sale-surface': tokens.saleSurface,
+    '--sale-surface-raised': tokens.saleSurfaceRaised,
+    '--sale-surface-hover': tokens.saleSurfaceHover,
+    '--sale-border': tokens.saleBorder,
+    '--sale-border-strong': tokens.saleBorderStrong,
+    '--sale-fg': tokens.saleFg,
+    '--sale-fg-muted': tokens.saleFgMuted,
+    '--sale-fg-subtle': tokens.saleFgSubtle,
+    '--sale-overlay': tokens.saleOverlay,
+
+    '--sale-pill-active-bg': tokens.salePillActiveBg,
+    '--sale-pill-active-border': tokens.salePillActiveBorder,
+    '--sale-pill-active-fg': tokens.salePillActiveFg,
+    '--sale-pill-inactive-bg': tokens.salePillInactiveBg,
+    '--sale-pill-inactive-border': tokens.salePillInactiveBorder,
+    '--sale-pill-inactive-fg': tokens.salePillInactiveFg,
+    '--sale-pill-inactive-hover': tokens.salePillInactiveHover,
+
+    '--sale-tab-track': tokens.saleTabTrack,
+    '--sale-tab-active-bg': tokens.saleTabActiveBg,
+    '--sale-tab-active-fg': tokens.saleTabActiveFg,
+    '--sale-tab-inactive-fg': tokens.saleTabInactiveFg,
+
+    '--sale-btn-primary-bg': tokens.saleBtnPrimaryBg,
+    '--sale-btn-primary-hover': tokens.saleBtnPrimaryHover,
+    '--sale-btn-primary-fg': tokens.saleBtnPrimaryFg,
+    '--sale-btn-secondary-bg': tokens.saleBtnSecondaryBg,
+    '--sale-btn-secondary-border': tokens.saleBtnSecondaryBorder,
+    '--sale-btn-secondary-fg': tokens.saleBtnSecondaryFg,
+    '--sale-btn-secondary-hover': tokens.saleBtnSecondaryHover,
+    '--sale-btn-edit-bg': tokens.saleBtnEditBg,
+    '--sale-btn-edit-border': tokens.saleBtnEditBorder,
+    '--sale-btn-edit-fg': tokens.saleBtnEditFg,
+    '--sale-btn-edit-hover': tokens.saleBtnEditHover,
+  };
+}
