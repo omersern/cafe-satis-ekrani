@@ -126,6 +126,7 @@ export default function Sale() {
   const [paymentMethods, setPaymentMethods] = useState(bootCatalog?.paymentMethods || []);
   const [focusedProductId, setFocusedProductId] = useState(null);
   const focusedProductTimerRef = useRef(null);
+  const searchOriginCategoryRef = useRef(null);
 
   const [cart, setCart] = useState(null);
   const cartRef = useRef(null);
@@ -501,6 +502,20 @@ export default function Sale() {
     clearTimeout(focusedProductTimerRef.current);
     focusedProductTimerRef.current = setTimeout(() => setFocusedProductId(null), 2600);
   }, [categories, selectCategory]);
+
+  const rememberSearchOrigin = useCallback(() => {
+    if (!searchOriginCategoryRef.current) {
+      searchOriginCategoryRef.current = { categoryId: activeCategoryId, parentId: activeParentId };
+    }
+  }, [activeCategoryId, activeParentId]);
+
+  const clearProductSearch = useCallback(() => {
+    const origin = searchOriginCategoryRef.current;
+    searchOriginCategoryRef.current = null;
+    clearTimeout(focusedProductTimerRef.current);
+    setFocusedProductId(null);
+    if (origin?.categoryId != null) selectCategory(origin.categoryId, origin.parentId);
+  }, [selectCategory]);
 
   useEffect(() => () => clearTimeout(focusedProductTimerRef.current), []);
 
@@ -1130,6 +1145,8 @@ export default function Sale() {
               allProducts={allProducts}
               focusedProductId={focusedProductId}
               onFindProduct={handleFindProduct}
+              onSearchStart={rememberSearchOrigin}
+              onSearchClear={clearProductSearch}
             />
           )}
           {currentView === 'masalar' && (

@@ -19,6 +19,8 @@ export default function ProductGrid({
   allProducts = [],
   focusedProductId = null,
   onFindProduct,
+  onSearchStart,
+  onSearchClear,
 }) {
   const hasTable = Boolean(tableInfo?.name);
   const showSubCategories = subCategories.length > 0;
@@ -54,9 +56,13 @@ export default function ProductGrid({
               value={query}
               onChange={(event) => {
                 const value = event.target.value;
+                if (value.trim() && !query.trim()) onSearchStart?.();
                 setQuery(value);
                 const term = value.trim().toLocaleLowerCase('tr-TR');
-                if (!term) return;
+                if (!term) {
+                  onSearchClear?.();
+                  return;
+                }
                 const product = allProducts.find((item) =>
                   String(item.name || '').toLocaleLowerCase('tr-TR').includes(term)
                 );
