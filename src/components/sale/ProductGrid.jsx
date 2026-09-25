@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { saleBtn } from './ui/SaleModal';
 
 export default function ProductGrid({
@@ -15,9 +16,27 @@ export default function ProductGrid({
   variantGroups,
   bundleGroups,
   tableInfo,
+  allProducts = [],
+  focusedProductId = null,
+  onFindProduct,
 }) {
   const hasTable = Boolean(tableInfo?.name);
   const showSubCategories = subCategories.length > 0;
+  const [query, setQuery] = useState('');
+  const productRefs = useRef(new Map());
+  const matches = useMemo(() => {
+    const term = query.trim().toLocaleLowerCase('tr-TR');
+    if (!term) return [];
+    return allProducts
+      .filter((product) => String(product.name || '').toLocaleLowerCase('tr-TR').includes(term))
+      .slice(0, 8);
+  }, [allProducts, query]);
+
+  useEffect(() => {
+    if (!focusedProductId) return;
+    const element = productRefs.current.get(String(focusedProductId));
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+  }, [focusedProductId, products]);
 
   const renderCategoryPill = (cat, isActive) => (
     <button
@@ -32,8 +51,35 @@ export default function ProductGrid({
 
   return (
     <div className="sale-win11-product-grid-wrap p-3 sm:p-4">
-      <header className="mb-3 flex items-center justify-between">
+      <header className="mb-3 flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white sm:text-3xl" />
+        <div className="sale-product-search relative w-full max-w-sm">
+          <label className="sr-only" htmlFor="sale-product-search">Ürün ara</label>
+          <input
+            id="sale-product-search"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Ürün ara…"
+            autoComplete="off"
+          />
+          {matches.length > 0 && (
+            <div className="sale-product-search-results" role="listbox" aria-label="Ürün sonuçları">
+              {matches.map((product) => (
+                <button
+                  key={product.id}
+                  type="button"
+                  role="option"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => { onFindProduct?.(product); setQuery(''); }}
+                >
+                  <span>{product.name}</span>
+                  <small>{product.sell_price} ₺</small>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         {!hasTable && (
           <div className="flex items-center gap-2">
             <button
@@ -104,8 +150,12 @@ export default function ProductGrid({
             return (
               <div
                 key={prod.id}
+                ref={(element) => {
+                  if (element) productRefs.current.set(String(prod.id), element);
+                  else productRefs.current.delete(String(prod.id));
+                }}
                 onClick={() => onProductClick(prod)}
-                className={`sale-win11-product sale-win11-product-compact product-item cursor-pointer${isBundle ? ' sale-win11-product--menu' : ' relative'}`}
+                className={`sale-win11-product sale-win11-product-compact product-item cursor-pointer${isBundle ? ' sale-win11-product--menu' : ' relative'}${Number(focusedProductId) === Number(prod.id) ? ' is-search-focused' : ''}`}
               >
                 {isBundle && (
                   <span className="sale-win11-product-badge sale-win11-product-badge-menu">Menü</span>

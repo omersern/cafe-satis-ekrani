@@ -124,6 +124,8 @@ export default function Sale() {
   const [bundleOptions, setBundleOptions] = useState(bootCatalog?.bundleOptions || []);
   const [bundleFixedItems, setBundleFixedItems] = useState(bootCatalog?.bundleFixedItems || []);
   const [paymentMethods, setPaymentMethods] = useState(bootCatalog?.paymentMethods || []);
+  const [focusedProductId, setFocusedProductId] = useState(null);
+  const focusedProductTimerRef = useRef(null);
 
   const [cart, setCart] = useState(null);
   const cartRef = useRef(null);
@@ -487,6 +489,20 @@ export default function Sale() {
   const handleSubCategoryClick = useCallback((categoryId) => {
     selectCategory(categoryId, activeParentId);
   }, [activeParentId, selectCategory]);
+
+  const handleFindProduct = useCallback((product) => {
+    const category = categories.find((item) => Number(item.id) === Number(product.category_id));
+    if (!category) return;
+    const parentId = category.parent_id != null && Number(category.parent_id) > 0
+      ? Number(category.parent_id)
+      : null;
+    selectCategory(category.id, parentId);
+    setFocusedProductId(product.id);
+    clearTimeout(focusedProductTimerRef.current);
+    focusedProductTimerRef.current = setTimeout(() => setFocusedProductId(null), 2600);
+  }, [categories, selectCategory]);
+
+  useEffect(() => () => clearTimeout(focusedProductTimerRef.current), []);
 
   const openModal = async (name, data = {}) => {
     if (name === 'payment') {
@@ -1111,6 +1127,9 @@ export default function Sale() {
               variantGroups={variantGroups}
               bundleGroups={bundleGroups}
               tableInfo={tableInfo}
+              allProducts={allProducts}
+              focusedProductId={focusedProductId}
+              onFindProduct={handleFindProduct}
             />
           )}
           {currentView === 'masalar' && (
