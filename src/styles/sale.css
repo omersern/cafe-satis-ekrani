@@ -1161,54 +1161,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.sale-product-search input {
-  width: 100%;
-  min-height: 2.5rem;
-  border: 1px solid var(--sale-border);
-  border-radius: .5rem;
-  padding: 0 .8rem;
-  background: var(--sale-surface);
-  color: var(--sale-fg);
-}
-
-.sale-product-search input:focus {
-  outline: 2px solid var(--app-accent);
-  outline-offset: 1px;
-}
-
-.sale-product-search-results {
-  position: absolute;
-  z-index: 40;
-  top: calc(100% + .35rem);
-  left: 0;
-  right: 0;
-  overflow: hidden;
-  border: 1px solid var(--sale-border-strong);
-  border-radius: .5rem;
-  background: var(--sale-surface);
-  box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .2);
-}
-
-.sale-product-search-results button {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  gap: .75rem;
-  padding: .65rem .8rem;
-  color: var(--sale-fg);
-  text-align: left;
-}
-
-.sale-product-search-results button:hover,
-.sale-product-search-results button:focus-visible { background: var(--sale-surface-hover); }
-.sale-product-search-results small { color: var(--sale-fg-subtle); white-space: nowrap; }
-
-.sale-win11-product.is-search-focused {
-  border: 3px solid var(--app-accent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-accent) 25%, transparent);
-}
-
 .sale-win11-product-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

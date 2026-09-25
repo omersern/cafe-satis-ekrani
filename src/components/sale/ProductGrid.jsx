@@ -53,7 +53,7 @@ export default function ProductGrid({
     <div className="sale-win11-product-grid-wrap p-3 sm:p-4">
       <header className="mb-3 flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white sm:text-3xl" />
-        <div className="sale-product-search relative w-full max-w-sm">
+        <div className="relative w-full max-w-sm">
           <label className="sr-only" htmlFor="sale-product-search">Ürün ara</label>
           <input
             id="sale-product-search"
@@ -62,9 +62,10 @@ export default function ProductGrid({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Ürün ara…"
             autoComplete="off"
+            className="min-h-10 w-full rounded-lg border border-[var(--sale-border)] bg-[var(--sale-surface)] px-3 text-[var(--sale-fg)] outline-none placeholder:text-[var(--sale-fg-subtle)] focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]"
           />
           {matches.length > 0 && (
-            <div className="sale-product-search-results" role="listbox" aria-label="Ürün sonuçları">
+            <div className="absolute left-0 right-0 top-[calc(100%+.35rem)] z-40 overflow-hidden rounded-lg border border-[var(--sale-border-strong)] bg-[var(--sale-surface)] shadow-xl" role="listbox" aria-label="Ürün sonuçları">
               {matches.map((product) => (
                 <button
                   key={product.id}
@@ -72,9 +73,10 @@ export default function ProductGrid({
                   role="option"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => { onFindProduct?.(product); setQuery(''); }}
+                  className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-[var(--sale-fg)] hover:bg-[var(--sale-surface-hover)] focus-visible:bg-[var(--sale-surface-hover)]"
                 >
                   <span>{product.name}</span>
-                  <small>{product.sell_price} ₺</small>
+                  <small className="whitespace-nowrap text-[var(--sale-fg-subtle)]">{product.sell_price} ₺</small>
                 </button>
               ))}
             </div>
@@ -155,7 +157,10 @@ export default function ProductGrid({
                   else productRefs.current.delete(String(prod.id));
                 }}
                 onClick={() => onProductClick(prod)}
-                className={`sale-win11-product sale-win11-product-compact product-item cursor-pointer${isBundle ? ' sale-win11-product--menu' : ' relative'}${Number(focusedProductId) === Number(prod.id) ? ' is-search-focused' : ''}`}
+                className={`sale-win11-product sale-win11-product-compact product-item cursor-pointer${isBundle ? ' sale-win11-product--menu' : ' relative'}`}
+                style={Number(focusedProductId) === Number(prod.id)
+                  ? { outline: '3px solid var(--app-accent)', outlineOffset: '2px' }
+                  : undefined}
               >
                 {isBundle && (
                   <span className="sale-win11-product-badge sale-win11-product-badge-menu">Menü</span>
