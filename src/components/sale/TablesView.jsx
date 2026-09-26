@@ -283,6 +283,16 @@ export default function TablesView({
     );
   };
 
+  const excludeOpenBulkTables = () => {
+    setBulkResult('');
+    setBulkSelected((current) => new Set(
+      [...current].filter((id) => {
+        const table = pcTables.find((item) => Number(item.id) === Number(id));
+        return table && !table.session && !table.additions?.length && !timers[table.id] && !timers[String(table.id)];
+      })
+    ));
+  };
+
   const runBulkAction = async (action) => {
     if (bulkActionBusy || selectedPcTables.length === 0) return;
     const eligible = selectedPcTables.filter((table) => canRunBulkAction(table, action));
@@ -1114,13 +1124,19 @@ export default function TablesView({
                     <h4 className="font-semibold text-[var(--sale-fg)]">Bilgisayarlar</h4>
                     <p className="mt-0.5 text-xs text-[var(--sale-fg-subtle)]">{bulkSelected.size} / {pcTables.length} bilgisayar seçildi</p>
                   </div>
-                  <label className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-xl border border-[var(--sale-border)] bg-[var(--sale-surface)] px-3.5 transition-colors hover:bg-[var(--sale-surface-hover)]">
-                    <input type="checkbox" className="h-4 w-4 accent-[var(--app-accent)]"
-                      checked={bulkSelected.size === pcTables.length}
-                      onChange={toggleAllBulkTables}
-                      disabled={Boolean(bulkActionBusy)} />
-                    <span className="text-sm font-semibold text-[var(--sale-fg)]">Tümünü seç</span>
-                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-xl border border-[var(--sale-border)] bg-[var(--sale-surface)] px-3.5 transition-colors hover:bg-[var(--sale-surface-hover)]">
+                      <input type="checkbox" className="h-4 w-4 accent-[var(--app-accent)]"
+                        checked={bulkSelected.size === pcTables.length}
+                        onChange={toggleAllBulkTables}
+                        disabled={Boolean(bulkActionBusy)} />
+                      <span className="text-sm font-semibold text-[var(--sale-fg)]">Tümünü seç</span>
+                    </label>
+                    <button type="button" onClick={excludeOpenBulkTables} disabled={Boolean(bulkActionBusy)}
+                      className="min-h-10 rounded-xl border border-[var(--sale-border)] bg-[var(--sale-surface)] px-3.5 text-sm font-semibold text-[var(--sale-fg)] transition-colors hover:bg-[var(--sale-surface-hover)] disabled:opacity-50">
+                      Açık masaları çıkart
+                    </button>
+                  </div>
                 </div>
 
                 <div className="min-h-[280px] flex-1 overflow-y-auto p-5 sm:p-6">
