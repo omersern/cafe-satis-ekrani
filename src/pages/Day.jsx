@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import DayDetailModal from '../components/day/DayDetailModal';
 import DayEndModal from '../components/day/DayEndModal';
 import DayStartModal from '../components/day/DayStartModal';
 import { dayBtn } from '../components/day/DayModalShell';
@@ -38,7 +37,6 @@ export default function Day() {
   const [isLoading, setIsLoading] = useState(false);
   const [pageError, setPageError] = useState('');
 
-  const [days, setDays] = useState([]);
   const [startSteps, setStartSteps] = useState([]);
   const [endSteps, setEndSteps] = useState([]);
   const [endStepsWithSystem, setEndStepsWithSystem] = useState([]);
@@ -50,8 +48,6 @@ export default function Day() {
 
   const [showStartModal, setShowStartModal] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(null);
   const [actionError, setActionError] = useState('');
 
   useEffect(() => {
@@ -78,7 +74,6 @@ export default function Day() {
       }
 
       const summary = res.data || {};
-      setDays(summary.data || summary.days || []);
       setStartSteps(summary.start_steps || []);
       setEndSteps(summary.end_steps || []);
       setDayStarted(summary.current_day === 1 || summary.current_day === true);
@@ -365,66 +360,6 @@ export default function Day() {
                 </section>
               )}
 
-              {canViewSummary && (
-                <section className="win11-metro-card overflow-hidden">
-                  <div className="win11-metro-card-header">
-                    <h2 className="win11-metro-card-title">Geçmiş günler</h2>
-                    <span className="day-win11-table-meta">Son 10 gün</span>
-                  </div>
-                  <div className="day-win11-table-wrap">
-                    <table className="day-win11-table">
-                      <thead>
-                        <tr>
-                          <th>Tarih</th>
-                          <th>Toplam ciro</th>
-                          <th>Başlangıç</th>
-                          <th>Bitiş</th>
-                          <th>Durum</th>
-                          <th>İşlem</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {days.map((day) => (
-                          <tr key={day.id}>
-                            <td className="day-win11-table-strong">{day.date}</td>
-                            <td className="day-win11-table-money">{day.total_payments}</td>
-                            <td>{day.start_date}</td>
-                            <td>{day.end_date || '—'}</td>
-                            <td>
-                              <span
-                                className={`day-win11-badge ${
-                                  day.status === 1 ? 'is-done' : 'is-open'
-                                }`}
-                              >
-                                {day.status === 1 ? 'Tamamlandı' : 'Devam ediyor'}
-                              </span>
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedDay(day);
-                                  setShowDetailModal(true);
-                                }}
-                                className={dayBtn.link}
-                              >
-                                Detay
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                        {days.length === 0 && (
-                          <tr>
-                            <td colSpan={6} className="day-win11-table-empty">
-                              Henüz kayıtlı gün bulunmuyor
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
-              )}
             </div>
           )}
         </div>
@@ -474,15 +409,6 @@ export default function Day() {
         />
       )}
 
-      {showDetailModal && canViewSummary && (
-        <DayDetailModal
-          day={selectedDay}
-          onClose={() => {
-            setShowDetailModal(false);
-            setSelectedDay(null);
-          }}
-        />
-      )}
     </div>
   );
 }

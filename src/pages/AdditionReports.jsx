@@ -3,6 +3,13 @@ import MetroShell from '../components/metro/MetroShell';
 import { apiJson, money } from '../lib/api';
 import useEscapeClose from '../hooks/useEscapeClose';
 
+function tableLabel(addition) {
+  const category = addition?.table_category;
+  const name = addition?.table_name;
+  if (category && name) return `${category} / ${name}`;
+  return name || category || '—';
+}
+
 function Status({ value }) {
   const open = Number(value) === 0;
   return (
@@ -101,7 +108,7 @@ export default function AdditionReports() {
                   <tr key={addition.id}>
                     <td>#{addition.id}</td>
                     <td>{addition.time?.slice(0, 5) || '—'}</td>
-                    <td>{addition.table_name ? `${addition.table_category} / ${addition.table_name}` : '—'}</td>
+                    <td>{tableLabel(addition)}</td>
                     <td>{addition.product_count ?? 0}</td>
                     <td>{addition.payment_methods || '—'}</td>
                     <td className="font-semibold">{money(addition.total_sales)}</td>
@@ -128,7 +135,10 @@ export default function AdditionReports() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setDetail(null); }}>
           <section className="win11-metro-card flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden" role="dialog" aria-modal="true" aria-label="Adisyon detayı">
             <div className="win11-metro-card-header">
-              <h2 className="win11-metro-card-title">Adisyon #{detail.addition.id}</h2>
+              <div className="min-w-0">
+                <h2 className="win11-metro-card-title">Adisyon #{detail.addition.id}</h2>
+                <p className="text-sm opacity-70">{tableLabel(detail.data?.addition || detail.addition)}</p>
+              </div>
               <button type="button" className="cafe-icon-btn ml-auto" aria-label="Kapat" onClick={() => setDetail(null)}>×</button>
             </div>
             <div className="metro-scroll overflow-y-auto p-5">
