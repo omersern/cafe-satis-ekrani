@@ -417,7 +417,7 @@ export default function PaymentModal({
                 </button>
               )}
             </div>
-            <div className="mt-4 flex-1 overflow-y-auto pr-2">
+            <div className="payment-product-list mt-4 flex-1 overflow-y-auto pr-2">
               {paymentProducts.length > 0 ? paymentProducts.map((item) => (
                 <PaymentProductItem
                   key={item.id}

@@ -691,6 +691,10 @@ label { color: var(--edge-muted); }
 .sale-view-toolbar-center { flex: 0 0 auto; }
 .sale-view-toolbar .sale-win11-tab-track { margin: 0; }
 .sale-cart-sheet-toggle { display: none; }
+.payment-paybar { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+@media (max-width: 1023px) {
+  .payment-product-list { flex: none; overflow: visible; }
+}
 
 .sale-table-context {
   display: flex;
