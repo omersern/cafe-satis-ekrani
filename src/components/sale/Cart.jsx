@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import CartItem from './CartItem';
 import { saleApi } from '../../lib/saleApi';
 import { saleBtn } from './ui/SaleModal';
@@ -49,9 +50,24 @@ export default function Cart({
   const tableLabel = tableInfo
     ? `${tableInfo.category} · ${tableInfo.name}`
     : null;
+  const itemCount = cart?.products?.length || 0;
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const previousCount = useRef(itemCount);
+
+  useEffect(() => {
+    if (itemCount > previousCount.current) setSheetOpen(true);
+    previousCount.current = itemCount;
+  }, [itemCount]);
 
   return (
-    <aside className="sale-win11-cart flex w-full shrink-0 flex-col lg:w-[22rem]">
+    <aside className={`sale-win11-cart flex w-full shrink-0 flex-col lg:w-[22rem]${sheetOpen ? '' : ' is-sheet-collapsed'}`}>
+      <button type="button" className="sale-cart-sheet-toggle" onClick={() => setSheetOpen((open) => !open)} aria-expanded={sheetOpen}>
+        <span>{sheetOpen ? 'Adisyonu gizle' : 'Adisyon'}</span>
+        <strong>
+          {itemCount} ürün
+          {cart ? ` · ${cartTotals.remaining.toFixed(2).replace('.', ',')} ₺` : ''}
+        </strong>
+      </button>
       <header className="sale-win11-cart-header">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-start gap-2">
@@ -201,7 +217,7 @@ export default function Cart({
 
       {cart && (
         <footer className="sale-win11-cart-footer space-y-3">
-          <div className="space-y-2 text-sm">
+          <div className="sale-cart-breakdown space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-slate-400">Ara toplam</span>
               <span className="font-medium text-white">

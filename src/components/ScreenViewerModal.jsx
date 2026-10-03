@@ -4,7 +4,7 @@ import { getCloudScreenWsUrl } from '../lib/cloudClient';
 import useEscapeClose from '../hooks/useEscapeClose';
 
 export default function ScreenViewerModal({ computer, onClose }) {
-  const [frameUrl, setFrameUrl] = useState('');
+  const [hasFrame, setHasFrame] = useState(false);
   const [fps, setFps] = useState(0);
   const [error, setError] = useState('');
   const [connected, setConnected] = useState(false);
@@ -15,6 +15,8 @@ export default function ScreenViewerModal({ computer, onClose }) {
   const viewportRef = useRef(null);
   const imageRef = useRef(null);
   const imageSurfaceRef = useRef(null);
+  const cursorRef = useRef(null);
+  const latestFrameRef = useRef('');
   const socketRef = useRef(null);
   const moveFrameRef = useRef(0);
   const pendingMoveRef = useRef(null);
@@ -27,7 +29,7 @@ export default function ScreenViewerModal({ computer, onClose }) {
 
   useEffect(() => {
     let cancelled = false;
-    let currentUrl = '';
+    let revealed = false;
     let frames = 0;
     let started = performance.now();
     let socket;
@@ -69,9 +71,15 @@ export default function ScreenViewerModal({ computer, onClose }) {
         }
         const nextUrl = URL.createObjectURL(new Blob([data], { type: 'image/jpeg' }));
         clearTimeout(streamTimer);
-        setFrameUrl(nextUrl);
-        if (currentUrl) URL.revokeObjectURL(currentUrl);
-        currentUrl = nextUrl;
+        const previous = latestFrameRef.current;
+        latestFrameRef.current = nextUrl;
+        if (previous.startsWith('blob:')) URL.revokeObjectURL(previous);
+        const image = imageRef.current;
+        if (image) image.src = nextUrl;
+        else if (!revealed) {
+          revealed = true;
+          setHasFrame(true);
+        }
         frames += 1;
         const now = performance.now();
         if (now - started >= 1000) {
@@ -79,7 +87,7 @@ export default function ScreenViewerModal({ computer, onClose }) {
           frames = 0;
           started = now;
         }
-        setError('');
+        setError((current) => (current ? '' : current));
       };
       socket.onerror = () => setError('Canlı görüntü bağlantısı kurulamadı.');
       socket.onclose = () => { setConnected(false); setControlling(false); setError((value) => value || 'Canlı görüntü bağlantısı kapandı.'); };
@@ -91,7 +99,7 @@ export default function ScreenViewerModal({ computer, onClose }) {
       socket?.close();
       clearTimeout(streamTimer);
       socketRef.current = null;
-      if (currentUrl) URL.revokeObjectURL(currentUrl);
+      if (latestFrameRef.current.startsWith('blob:')) URL.revokeObjectURL(latestFrameRef.current);
       if (moveFrameRef.current) cancelAnimationFrame(moveFrameRef.current);
       queueCommand({ machineId: computer.machineId, commandType: 'screen_stream_stop' }).catch(() => {});
     };
@@ -139,11 +147,21 @@ export default function ScreenViewerModal({ computer, onClose }) {
     };
   }
 
+  function placeCursor(event) {
+    const surface = imageSurfaceRef.current;
+    const cursor = cursorRef.current;
+    if (!surface || !cursor) return;
+    const rect = surface.getBoundingClientRect();
+    cursor.style.transform = `translate(${event.clientX - rect.left}px, ${event.clientY - rect.top}px) translate(-50%, -50%)`;
+    cursor.style.display = 'block';
+  }
+
   function pointer(event, kind) {
     if (!controlling) return;
     const point = position(event);
     if (!point) return;
     event.preventDefault();
+    if (kind === 'move') placeCursor(event);
     if (kind === 'move') {
       pendingMoveRef.current = point;
       if (moveFrameRef.current) return;
@@ -160,12 +178,15 @@ export default function ScreenViewerModal({ computer, onClose }) {
 
   function toggleControl() {
     send({ type: controlling ? 'release' : 'takeover' });
-    if (controlling) setControlling(false);
+    if (controlling) {
+      setControlling(false);
+      if (cursorRef.current) cursorRef.current.style.display = 'none';
+    }
   }
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-3 backdrop-blur-md"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-3"
       style={{ position: 'fixed', inset: 0, zIndex: 100 }}
       role="dialog"
       aria-modal="true"
@@ -191,13 +212,13 @@ export default function ScreenViewerModal({ computer, onClose }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className={`screen-viewer-control-btn min-h-10 rounded-lg px-4 text-sm font-semibold ${controlling ? 'is-active' : ''}`} onClick={toggleControl} disabled={!connected || !frameUrl}>{controlling ? 'Yönetimi bırak' : 'Yönetimi devral'}</button>
+            <button className={`screen-viewer-control-btn min-h-10 rounded-lg px-4 text-sm font-semibold ${controlling ? 'is-active' : ''}`} onClick={toggleControl} disabled={!connected || !hasFrame}>{controlling ? 'Yönetimi bırak' : 'Yönetimi devral'}</button>
             <button className="screen-viewer-secondary-btn min-h-10 rounded-lg px-4 text-sm font-semibold" onClick={() => shellRef.current?.requestFullscreen?.()}>Tam ekran</button>
             <button className="screen-viewer-close-btn grid h-10 w-10 place-items-center rounded-lg text-lg" onClick={onClose} aria-label="Kapat">✕</button>
           </div>
         </header>
         <main ref={viewportRef} className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black" style={{ flex: '1 1 0%', minHeight: 0, backgroundColor: '#000' }}>
-          {frameUrl ? (
+          {hasFrame ? (
             <div
               ref={imageSurfaceRef}
               className={`relative shrink-0 overflow-hidden ${controlling ? 'cursor-none ring-2 ring-inset ring-blue-500/70' : ''}`}
@@ -216,8 +237,10 @@ export default function ScreenViewerModal({ computer, onClose }) {
               }}
             >
               <img
-                ref={imageRef}
-                src={frameUrl}
+                ref={(node) => {
+                  imageRef.current = node;
+                  if (node && latestFrameRef.current) node.src = latestFrameRef.current;
+                }}
                 alt={`${computer.name} canlı ekranı`}
                 draggable="false"
                 className="h-full w-full select-none"
@@ -225,6 +248,10 @@ export default function ScreenViewerModal({ computer, onClose }) {
                   const { naturalWidth: width, naturalHeight: height } = event.currentTarget;
                   setFrameSize((current) => current.width === width && current.height === height ? current : { width, height });
                 }}
+              />
+              <span
+                ref={cursorRef}
+                className="pointer-events-none absolute left-0 top-0 z-10 hidden h-3.5 w-3.5 rounded-full border-2 border-white bg-sky-500 shadow"
               />
             </div>
           ) : <div className="absolute inset-0 grid place-items-center"><div className="text-center"><span className="mx-auto block h-7 w-7 animate-spin rounded-full border-2 border-zinc-700 border-t-blue-400" /><p className="mt-3 text-sm text-zinc-400">Client yayını başlatılıyor…</p></div></div>}

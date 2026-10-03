@@ -292,7 +292,7 @@ label { color: var(--edge-muted); }
 .edge-shell {
   display: flex;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--edge-bg);
   color: var(--edge-fg);
@@ -690,6 +690,7 @@ label { color: var(--edge-muted); }
 .sale-view-toolbar-end { justify-content: flex-end; }
 .sale-view-toolbar-center { flex: 0 0 auto; }
 .sale-view-toolbar .sale-win11-tab-track { margin: 0; }
+.sale-cart-sheet-toggle { display: none; }
 
 .sale-table-context {
   display: flex;
@@ -839,15 +840,49 @@ label { color: var(--edge-muted); }
   .edge-header { padding-left: 10px; }
 }
 
+@media (max-width: 1023px) {
+  .sale-cart-sheet-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 0;
+    border-bottom: 1px solid var(--sale-border);
+    background: var(--sale-surface);
+    padding: 0 16px;
+    color: var(--sale-fg);
+    font-size: 14px;
+    font-weight: 650;
+  }
+  .sale-cart-sheet-toggle strong { font-variant-numeric: tabular-nums; }
+  .sale-win11-cart { max-height: min(72dvh, 640px); padding-bottom: env(safe-area-inset-bottom); }
+  .sale-win11-cart.is-sheet-collapsed { max-height: none; }
+  .sale-win11-cart.is-sheet-collapsed :is(.sale-win11-cart-header, .sale-win11-cart-body, .sale-cart-breakdown) { display: none; }
+  .sale-win11-cart.is-sheet-collapsed .sale-win11-cart-footer { padding-top: 10px; }
+  .sale-view-toolbar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .sale-view-toolbar-center { order: -1; flex: 1 1 100%; }
+  .sale-view-toolbar .sale-win11-tab-track { width: 100%; }
+  .sale-view-toolbar .sale-segment { flex: 1 1 0; justify-content: center; min-height: 44px; }
+  .sale-product-tools { width: 100%; flex-wrap: wrap; }
+  .sale-product-tools input { min-width: 0; flex: 1 1 8rem; width: auto !important; }
+  .screen-viewer-header { height: auto; min-height: 64px; flex-wrap: wrap; align-items: flex-start; padding: 12px; }
+  .screen-viewer-header > div:last-child { width: 100%; justify-content: flex-end; }
+}
+
 @media (max-width: 600px) {
-  .edge-header { height: 58px; min-height: 58px; padding-right: 6px; }
+  .edge-header { height: 58px; min-height: 58px; padding-right: 6px; padding-top: env(safe-area-inset-top); }
   .edge-header-copy p,.edge-connection,.edge-clock { display: none; }
+  .edge-header-actions { gap: 4px; }
+  .edge-afk-timer { display: none; }
   .edge-window-button { width: 32px; height: 32px; }
-  .sale-view-toolbar { justify-content: flex-start; overflow-x: auto; padding-inline: 12px; }
-  .sale-table-context { min-width: 160px; max-width: min(58vw, 280px); }
+  .sale-view-toolbar { justify-content: flex-start; padding-inline: 10px; }
+  .sale-table-context { min-width: 0; max-width: 100%; }
   .sale-table-context-name { font-size: 14px; }
-  .sale-table-actions { max-width: min(58vw, 280px); }
-  .sale-table-action { padding: 0 10px; font-size: 11px; }
+  .sale-table-actions { max-width: 100%; flex-wrap: wrap; overflow: visible; }
+  .sale-table-action { padding: 0 10px; font-size: 12px; min-height: 40px; }
+  .screen-viewer-shell { width: 100% !important; height: 100dvh !important; max-width: none !important; border-radius: 0 !important; }
 }
 
 /* beUI session surfaces: table start, timer and client management. */

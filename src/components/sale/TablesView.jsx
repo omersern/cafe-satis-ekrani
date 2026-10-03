@@ -641,11 +641,13 @@ export default function TablesView({
     }
   };
 
-  // Saniyelik tick: süre sayaçları + istemci online/offline durumu canlı güncellensin.
+  // Saniyelik tick: süre sayaçları canlı güncellensin. Ekran yönetimi açıkken
+  // bütün masaları yeniden çizmek fareyi geciktirir.
   useEffect(() => {
+    if (screenViewerComputer) return undefined;
     const t = setInterval(() => setTick((n) => n + 1), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [screenViewerComputer]);
 
   const mapToTableTiles = useCallback((computers, activeSessions, additions, categoryId) => {
     const sessionsByMachine = new Map();

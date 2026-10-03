@@ -48,7 +48,7 @@ export default function ProductGrid({
       <header className="mb-3 flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white sm:text-3xl" />
         {!hasTable && (
-          <div className="flex items-center gap-2">
+          <div className="sale-product-tools flex items-center gap-2">
             <label className="sr-only" htmlFor="sale-product-search">Ürün ara</label>
             <input
               id="sale-product-search"
