@@ -335,6 +335,20 @@ export default function PaymentModal({
 
   const isComplimentary = complimentaryPaymentMethod && selectedMethod == complimentaryPaymentMethod.id;
   const isOverlayActive = isLoadingPaymentData || isRefreshing || isPaying;
+  const renderPayButton = () => (
+    <button
+      type="button"
+      onClick={handlePay}
+      disabled={isOverlayActive || !selectedMethod || parseFloat(keypadValue) <= 0}
+      className={`w-full p-4 text-lg font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+        isComplimentary
+          ? 'rounded-lg bg-orange-600 text-white hover:bg-orange-700'
+          : `${saleBtn.primary} w-full p-4 text-lg`
+      }`}
+    >
+      {isPaying ? 'Ödeme alınıyor…' : (isComplimentary ? 'İkram Et' : 'Tahsil Et')}
+    </button>
+  );
   const overlayMessage = isPaying
     ? 'Ödeme işleniyor…'
     : (isRefreshing ? 'Güncelleniyor…' : 'Ödeme verileri yükleniyor…');
@@ -354,8 +368,8 @@ export default function PaymentModal({
         </div>
       )}
 
-      <div className="theme-modal-shell fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-        <div ref={modalRef} tabIndex={-1} className="relative flex max-h-[90vh] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-2xl outline-none lg:flex-row">
+      <div className="theme-modal-shell payment-modal-backdrop fixed inset-0 z-50 flex items-stretch justify-center bg-black/70 p-0 backdrop-blur-sm lg:items-center lg:p-4">
+        <div ref={modalRef} tabIndex={-1} className="payment-modal relative flex h-[100dvh] max-h-[100dvh] w-full max-w-7xl flex-col overflow-hidden rounded-none border border-slate-700 bg-slate-800 shadow-2xl outline-none lg:h-auto lg:max-h-[90vh] lg:flex-row lg:rounded-2xl">
           {isOverlayActive && (
             <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-[2px]">
               <SaleSpinner className="h-10 w-10 text-blue-400" />
@@ -384,7 +398,8 @@ export default function PaymentModal({
             </div>
           )}
 
-          <div className="flex w-full flex-col p-6 sm:p-8 lg:w-1/2">
+          <div className="payment-modal-scroll flex min-h-0 flex-1 flex-col overflow-y-auto lg:contents">
+          <div className="flex w-full flex-col p-4 sm:p-8 lg:w-1/2">
             <div className="mb-1 flex items-center justify-between gap-3">
               <h3 className="text-2xl font-bold text-white">Ödeme Ekranı</h3>
               {cartTotals.remaining > 0 && (
@@ -428,7 +443,7 @@ export default function PaymentModal({
             </div>
           </div>
 
-          <div className="flex w-full flex-col bg-slate-900 p-6 sm:p-8 lg:w-1/2 lg:rounded-r-2xl">
+          <div className="flex w-full flex-col bg-slate-900 p-4 sm:p-8 lg:w-1/2 lg:rounded-r-2xl">
             {additionPayments.length > 0 && (
               <div className="mt-2 flex-grow-0 rounded-lg border border-slate-700 bg-slate-800 p-3">
                 <h4 className="mb-2 shrink-0 text-sm text-slate-400">Alınan Ödemeler</h4>
@@ -478,7 +493,7 @@ export default function PaymentModal({
             </div>
 
             <div className="mt-auto">
-              <div className="mb-3 mt-4 grid grid-cols-3 gap-3">
+              <div className="mb-3 mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
                 {visibleMethods.map((m) => (
                   <button
                     key={m.id}
@@ -497,19 +512,15 @@ export default function PaymentModal({
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={handlePay}
-                disabled={isOverlayActive || !selectedMethod || parseFloat(keypadValue) <= 0}
-                className={`w-full p-4 text-lg font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                  isComplimentary
-                    ? 'rounded-lg bg-orange-600 text-white hover:bg-orange-700'
-                    : `${saleBtn.primary} w-full p-4 text-lg`
-                }`}
-              >
-                {isPaying ? 'Ödeme alınıyor…' : (isComplimentary ? 'İkram Et' : 'Tahsil Et')}
-              </button>
+              <div className="hidden lg:block">
+                {renderPayButton()}
+              </div>
             </div>
+          </div>
+          </div>
+
+          <div className="payment-paybar shrink-0 border-t border-slate-700 bg-slate-900 px-4 pt-3 lg:hidden">
+            {renderPayButton()}
           </div>
 
           <SaleToast

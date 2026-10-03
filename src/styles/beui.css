@@ -857,10 +857,24 @@ label { color: var(--edge-muted); }
     font-weight: 650;
   }
   .sale-cart-sheet-toggle strong { font-variant-numeric: tabular-nums; }
-  .sale-win11-cart { max-height: min(72dvh, 640px); padding-bottom: env(safe-area-inset-bottom); }
-  .sale-win11-cart.is-sheet-collapsed { max-height: none; }
+  .sale-win11-layout { min-height: 0; }
+  .sale-win11-cart {
+    flex-shrink: 1 !important;
+    min-height: 0;
+    max-height: 52%;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .sale-win11-cart-body { flex: none !important; overflow: visible !important; }
+  .sale-win11-cart-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+  .sale-win11-cart.is-sheet-collapsed { flex-shrink: 0 !important; max-height: none; overflow: visible; }
   .sale-win11-cart.is-sheet-collapsed :is(.sale-win11-cart-header, .sale-win11-cart-body, .sale-cart-breakdown) { display: none; }
-  .sale-win11-cart.is-sheet-collapsed .sale-win11-cart-footer { padding-top: 10px; }
+  .sale-win11-cart.is-sheet-collapsed .sale-win11-cart-footer { padding-top: 8px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
   .sale-view-toolbar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
   .sale-view-toolbar-center { order: -1; flex: 1 1 100%; }
   .sale-view-toolbar .sale-win11-tab-track { width: 100%; }
