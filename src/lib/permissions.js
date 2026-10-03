@@ -4,6 +4,11 @@ export const ADDITION_PERMISSIONS = {
   DISCOUNT: 'addition.discount',
 };
 
+export const TABLE_TIMER_PERMISSIONS = {
+  START: 'table.timer.start',
+  STOP: 'table.timer.stop',
+};
+
 export const PERMS = {
   VIEW_METRO: 'view_metro',
   MANAGE_COMPUTERS: 'manage_computers',
@@ -41,6 +46,8 @@ const CASHIER = new Set([
 
 const ADMIN_EXTRA = new Set([
   ADDITION_PERMISSIONS.DISCOUNT,
+  TABLE_TIMER_PERMISSIONS.START,
+  TABLE_TIMER_PERMISSIONS.STOP,
   PERMS.DAY_CLOSE,
   PERMS.MANAGE_TARIFFS,
   PERMS.MANAGE_SETTINGS,

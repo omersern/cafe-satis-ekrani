@@ -31,7 +31,7 @@ import { purgeLegacyDraftKeys } from '../lib/additionFormat';
 import { runSaleTransaction } from '../lib/saleLoading';
 import { removeSplitBillPlan } from '../lib/splitBillStore';
 import { applyTimeLineRounding, computeCartTotals } from '../lib/additionDiscount';
-import { ADDITION_PERMISSIONS } from '../lib/permissions';
+import { ADDITION_PERMISSIONS, TABLE_TIMER_PERMISSIONS } from '../lib/permissions';
 import { usePermissions } from '../hooks/usePermissions';
 import {
   endSession,
@@ -154,6 +154,8 @@ export default function Sale() {
 
   const { hasPermission, refreshPermissions } = usePermissions();
   const canApplyDiscount = hasPermission(ADDITION_PERMISSIONS.DISCOUNT);
+  const canStartTimer = hasPermission(TABLE_TIMER_PERMISSIONS.START);
+  const canStopTimer = hasPermission(TABLE_TIMER_PERMISSIONS.STOP);
 
   useEffect(() => {
     refreshPermissions();
@@ -863,6 +865,10 @@ export default function Sale() {
       const runningTimer = Boolean(timer);
 
       if (isTimerTable(table) && !hasOpenSession && !runningTimer) {
+        if (!canStartTimer) {
+          showError('Masa süresini başlatma yetkiniz yok.');
+          return;
+        }
         const deviceType = String(table.deviceType || table.device_type || '').toLowerCase() || null;
         if (Date.now() - tariffListRef.current.at > 60000) {
           const tariffsRes = await listTariffs();
@@ -886,6 +892,10 @@ export default function Sale() {
       }
 
       const closeTimerForPayment = isTimerTable(table) && (runningTimer || hasOpenSession);
+      if (closeTimerForPayment && !canStopTimer) {
+        showError('Masa süresini durdurma yetkiniz yok.');
+        return;
+      }
       let additionId = await activateTableFromGrid(table, timer, { loadAddition: !closeTimerForPayment && !hasOpenSession });
       if (closeTimerForPayment) {
         // Ödeme iznini kapanış isteği ile aynı anda hazırla; modal açılışında ikinci kez beklenmez.
@@ -928,7 +938,7 @@ export default function Sale() {
     } catch (error) {
       showError(error.message || 'İşlem başarısız.');
     }
-  }, [activateTableFromGrid, getAdditionDetails, openModal, showError]);
+  }, [activateTableFromGrid, canStartTimer, canStopTimer, getAdditionDetails, openModal, showError]);
 
   const handleTableTransferred = useCallback(async (data) => {
     const table = data?.table;
@@ -1049,10 +1059,13 @@ export default function Sale() {
   );
   const timerActionLabel = useMemo(() => {
     if (!tableInfo || !isTimerTable(selectedStation)) return null;
-    return hasActiveTableSession ? 'Oturumu yönet' : 'Masayı aç';
+    if (hasActiveTableSession) return canStopTimer ? 'Oturumu yönet' : null;
+    return canStartTimer ? 'Masayı aç' : null;
   }, [
     tableInfo,
     hasActiveTableSession,
+    canStartTimer,
+    canStopTimer,
     selectedStation?.deviceType,
     selectedStation?.device_type,
   ]);
@@ -1171,7 +1184,13 @@ export default function Sale() {
               loginRequestDurationLabel={loginRequests.durationLabel}
               onManageSession={(computer, session) => setManagedSession({ computer, session })}
               onTableDoubleClick={handleTableDoubleClick}
+              canStartTimer={canStartTimer}
+              canStopTimer={canStopTimer}
               onStartTable={(table) => {
+                if (!canStartTimer) {
+                  showError('Masa süresini başlatma yetkiniz yok.');
+                  return;
+                }
                 setSelectedStation(table);
                 openModal('startTable', { returnToTables: true });
               }}
@@ -1352,6 +1371,7 @@ export default function Sale() {
       {managedTimer && (
         <TimerTableModal
           table={managedTimer}
+          canStop={canStopTimer}
           onClose={() => setManagedTimer(null)}
           onChanged={async () => {
             const timerRes = await listTableTimers();

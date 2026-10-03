@@ -21,7 +21,7 @@ function startTime(timer) {
   return Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' }).format(date);
 }
 
-export default function TimerTableModal({ table, onClose, onChanged, onError }) {
+export default function TimerTableModal({ table, canStop = false, onClose, onChanged, onError }) {
   const [timer, setTimer] = useState(table?.timer);
   const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(Date.now());
@@ -71,7 +71,7 @@ export default function TimerTableModal({ table, onClose, onChanged, onError }) 
           <div className="compact-metrics"><div><span>Geçen süre</span><strong>{hms(seconds)}</strong></div><div><span>Güncel tutar</span><strong>{money(timer.amount)}</strong></div></div>
           {timer.plannedMinutes && <div className="compact-progress"><span style={{ width: `${Math.min(100, elapsedMinutes / Number(timer.plannedMinutes) * 100)}%` }} /><small>{elapsedMinutes} / {timer.plannedMinutes} dk</small></div>}
         </div>
-        <div className="compact-modal-footer"><button type="button" className="be-button secondary" onClick={onClose} disabled={busy}>Kapat</button><button type="button" className="be-button danger" onClick={stop} disabled={busy}>{busy ? 'Durduruluyor…' : 'Masayı durdur'}</button></div>
+        <div className="compact-modal-footer"><button type="button" className="be-button secondary" onClick={onClose} disabled={busy}>Kapat</button>{canStop && <button type="button" className="be-button danger" onClick={stop} disabled={busy}>{busy ? 'Durduruluyor…' : 'Masayı durdur'}</button>}</div>
       </div>
     </SaleModalOverlay>
   );

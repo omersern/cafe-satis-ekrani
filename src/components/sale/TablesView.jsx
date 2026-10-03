@@ -192,6 +192,8 @@ export default function TablesView({
   onManageSession,
   onStartTable,
   onTableDoubleClick,
+  canStartTimer = false,
+  canStopTimer = false,
   focusTableId = null,
   focusCategoryName = null,
 }) {
@@ -1037,7 +1039,7 @@ export default function TablesView({
                         Oturumu yönet
                       </button>
                     )}
-                    {!table.session && running && (
+                    {!table.session && running && canStopTimer && (
                       <button
                         type="button"
                         data-table-action="manage-timer"
@@ -1047,7 +1049,7 @@ export default function TablesView({
                         Oturumu yönet
                       </button>
                     )}
-                    {!table.session && !running && isTimerTable(table) && (
+                    {!table.session && !running && isTimerTable(table) && canStartTimer && (
                       <button
                         type="button"
                         data-table-action="start-table"
@@ -1089,6 +1091,7 @@ export default function TablesView({
       {manageTimer && (
         <TimerTableModal
           table={manageTimer}
+          canStop={canStopTimer}
           onClose={() => setManageTimer(null)}
           onChanged={() => refreshRef.current?.()}
           onError={onError}
