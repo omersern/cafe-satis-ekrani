@@ -3,7 +3,17 @@
  */
 import { redirectToLogin, shouldClearStaffSession } from './sessionAuth';
 
-const DEFAULT_API = import.meta.env.VITE_API_URL || import.meta.env.CAFE_CLOUD_API_URL || 'https://test-api.webbekpos.com';
+function envApiUrl() {
+  return String(
+    import.meta.env.VITE_API_URL || import.meta.env.CAFE_CLOUD_API_URL || 'https://test-api.webbekpos.com',
+  ).replace(/\/$/, '');
+}
+
+function envWsUrl() {
+  const explicit = import.meta.env.VITE_WS_URL || import.meta.env.CAFE_CLOUD_WS_URL;
+  if (explicit) return String(explicit).replace(/\/$/, '');
+  return envApiUrl().replace(/^http/i, 'ws');
+}
 
 let cachedConfig = null;
 let socket = null;
@@ -16,20 +26,23 @@ async function loadAppConfig() {
   if (cachedConfig) return cachedConfig;
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem('cafe-cloud-config') || '{}'); } catch { /* ignore */ }
-  cachedConfig = { apiUrl: DEFAULT_API.replace(/\/$/, ''), ...saved };
+  cachedConfig = {
+    clientId: saved.clientId || null,
+    deviceId: saved.deviceId || null,
+    apiUrl: envApiUrl(),
+    wsUrl: envWsUrl(),
+  };
   return cachedConfig;
 }
 
 export async function getCloudApiUrl() {
   const cfg = await loadAppConfig();
-  return String(cfg.apiUrl || DEFAULT_API).replace(/\/$/, '');
+  return String(cfg.apiUrl || envApiUrl()).replace(/\/$/, '');
 }
 
 export async function getCloudWsUrl() {
   const cfg = await loadAppConfig();
-  const api = String(cfg.apiUrl || DEFAULT_API).replace(/\/$/, '');
-  if (cfg.wsUrl) return String(cfg.wsUrl).replace(/\/$/, '');
-  return api.replace(/^http/i, 'ws');
+  return String(cfg.wsUrl || envWsUrl()).replace(/\/$/, '');
 }
 
 // Ekran yayını, RPC soket adresini değil doğrudan cloud API'nin screen endpointini kullanır.
@@ -197,7 +210,7 @@ export async function getCloudStatus() {
 }
 
 export function saveCloudPairing(clientId, deviceId) {
-  cachedConfig = { ...(cachedConfig || {}), clientId, deviceId };
+  cachedConfig = { clientId, deviceId, apiUrl: envApiUrl(), wsUrl: envWsUrl() };
   localStorage.setItem('cafe-cloud-config', JSON.stringify(cachedConfig));
   localStorage.setItem('cafe_sale_kv:client_id', JSON.stringify(clientId));
   localStorage.setItem('cafe_sale_kv:device_id', JSON.stringify(deviceId));

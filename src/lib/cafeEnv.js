@@ -44,8 +44,6 @@ async function resolveCloudIds() {
     const res = JSON.parse(localStorage.getItem('cafe-cloud-config') || '{}');
     if (res.clientId) lsSet('client_id', res.clientId);
     if (res.deviceId) lsSet('device_id', res.deviceId);
-    if (res.apiUrl) lsSet('cloud_api_url', res.apiUrl);
-    if (res.wsUrl) lsSet('cloud_ws_url', res.wsUrl);
     return res;
   } catch {
     return null;
@@ -61,7 +59,7 @@ export function installCafeEnv() {
       return import.meta.env.VITE_API_URL || import.meta.env.CAFE_CLOUD_API_URL || 'https://test-api.webbekpos.com';
     },
     get WS_URL() {
-      return lsGet('cloud_ws_url') || DEFAULT_WS;
+      return DEFAULT_WS;
     },
     async getKey(key) {
       if (key === 'auth_key' || key === 'auth_token') {
