@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
         id: user.id ?? user.userId,
         name: user.name,
         roleId: user.roleId ?? user.role_id,
+        roleName: user.roleName ?? user.role_name ?? '',
       })) : []);
     } catch (error) {
       console.error(error);

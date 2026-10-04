@@ -225,12 +225,7 @@ export default function PinLogin() {
     return () => window.removeEventListener('keydown', onKeyDown, true);
   }, [addDigit, backspace, clearPin, tryLogin, staffList]);
 
-  const roleLabel = (user) => {
-    if (user.role === 'admin' || (user.roleId != null && Number(user.roleId) !== 1)) {
-      return 'Yönetici';
-    }
-    return 'Kasiyer';
-  };
+  const roleLabel = (user) => user.roleName || '';
 
   return (
     <div
